@@ -4,7 +4,9 @@ import dotenv from 'dotenv'
 import cors from 'cors';
 
 import sessionMiddleware from './middleware/session.js'
+
 import authRoutes from './routes/authRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js'
 
 dotenv.config({path: '../../.env'})
 
@@ -16,6 +18,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json()); // Für das Parsen von JSON im body von Anfragen
 app.use('/api/auth', authRoutes)
+app.use('/api/budgets', budgetRoutes);
 app.use(sessionMiddleware);
 
 // Einfache Route als Test

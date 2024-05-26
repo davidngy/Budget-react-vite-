@@ -1,16 +1,31 @@
 
 import React, { useState } from "react";
+import axios from 'axios';
 
 function EnterBudget({onSetBudget})
 {
     const [inputValue, setInputValue] = useState('');
 
-    const enterBudget = (event) =>
+    const enterBudget = async (event) =>
     {
         event.preventDefault();
-        onSetBudget(inputValue);
-        setInputValue('')
+        if(!inputValue) return;
+
+        try
+        {
+            const response = await axios.post('/api/budgets', {
+                total_budget: inputValue
+            }, {
+                withCredentials: true
+            });
+        } catch (error) 
+        {
+            console.error('Error setting budget:', error);
+            alert('Failed to set budget. Please try again.');
+        }
     }
+
+
     const handleChange = (event) =>
     {
         setInputValue(parseFloat(event.target.value))

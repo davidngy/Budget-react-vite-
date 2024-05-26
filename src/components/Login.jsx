@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login()
 {
@@ -10,17 +11,21 @@ function Login()
     const handleSubmit = async (event) =>
     {
         event.preventDefault();
-        const response = await fetch('http://localhost:3001/api/auth/login',
-    {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password}),
-    });
-        const data = await response.json()
-        navigate('/');
-        console.log(data);
+        try
+        {
+            const response = await axios.post('http://localhost:3001/api/auth/login', {
+                email, password
+            });
+            if(response.status === 200) 
+                {
+                    alert('logged in')
+                    navigate('/')
+                }
+        }
+        catch (error)
+        {
+            console.error(error.response || error);
+        }
     }
     return(
     <div className="flex justify-center items-center h-screen"> {/* Zentriert das Formular vertikal und horizontal auf dem Bildschirm */}

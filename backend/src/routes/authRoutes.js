@@ -11,6 +11,7 @@ router.post('/register', async (req, res) =>
         const { email, password } = req.body;
         const user = new User({ email, password });
         await user.save();
+
         res.status(201).send({message: 'User created!'});
     }
     catch (error)
@@ -40,6 +41,7 @@ router.post('/login', async (req, res) =>
         }
         else if(isMatch)
         {
+            req.session.userId = user._id;
             res.send({ message: 'login succesful.'})
         }
     }
