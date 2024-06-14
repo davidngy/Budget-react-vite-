@@ -13,14 +13,26 @@ function Login()
         event.preventDefault();
         try
         {
+            const trimmedEmail = email.trim();
+            const trimmedPassword = password.trim();
             const response = await axios.post('http://localhost:3001/api/auth/login', {
-                email, password
+                email: trimmedEmail,
+                password: trimmedPassword
+            }, {
+                withCredentials: true
             });
-            if(response.status === 200) 
-                {
-                    alert('logged in')
-                    navigate('/')
-                }
+            console.log(response)
+
+
+            const { budgetId } = response.data;
+
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('budgetId', budgetId);
+
+            alert('logged in')
+            navigate(`/${budgetId}`)
+            
+
         }
         catch (error)
         {

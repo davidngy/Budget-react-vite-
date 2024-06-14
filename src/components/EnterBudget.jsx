@@ -1,26 +1,32 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 
-function EnterBudget({onSetBudget})
+function EnterBudget({budgetId, onBudgetChange})
 {
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState(0)
 
     const enterBudget = async (event) =>
     {
         event.preventDefault();
-        if(!inputValue) return;
-
+        if (!inputValue) {
+            console.log('Input value is empty');
+            return;
+        }
+        console.log("this is the sending budget:", inputValue);
         try
         {
-            const response = await axios.post('/api/budgets', {
-                total_budget: inputValue
+            const response = await axios.post('http://localhost:3001/api/budgets/', {
+                total_budget: inputValue,
+                budget_id: budgetId
             }, {
                 withCredentials: true
             });
+            onBudgetChange();
+            console.log("response:", response);
         } catch (error) 
         {
-            console.error('Error setting budget:', error);
+            console.error('Error setting budget:', error.repsone ? error.response.data : error.message);
             alert('Failed to set budget. Please try again.');
         }
     }
@@ -28,8 +34,10 @@ function EnterBudget({onSetBudget})
 
     const handleChange = (event) =>
     {
-        setInputValue(parseFloat(event.target.value))
+        const value = parseFloat(event.target.value);
+        setInputValue(value);
     }
+    
     return (
         <>
             <div className="shadow-lg flex flex-col items-start">

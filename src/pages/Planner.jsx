@@ -1,54 +1,64 @@
-import { useState } from 'react'
-import React from 'react'
-import '../App.css'
-import TopBar from '../components/TopBar'
-import Expenses from '../components/Expenses'
-import EnterBudget from '../components/EnterBudget'
-import Information from '../components/Information'
-import ExpensesList from '../components/ExpensesList'
-
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import React from 'react';
+import '../App.css';
+import TopBar from '../components/TopBar';
+import Expenses from '../components/Expenses';
+import EnterBudget from '../components/EnterBudget';
+import Information from '../components/Information';
+import ExpensesList from '../components/ExpensesList';
+import axios from 'axios';
 
 function Planner() {
-  const [budget, setBudget] = useState(0)
-  const [expenseEntries, setExpenseEntries] = useState([]);
-  
-  const handleAddExpense = (itemValue, priceValue) =>
-  {
-    const newExpense = {
-      id: Date.now(),
-      itemValue,
-      priceValue
-    };
-    setExpenseEntries(prevEntries => [...prevEntries, newExpense])
-  }
+  const { budgetId } = useParams();
+  const [budget, setBudget] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [balance, setBalance] = useState(0);
 
-  const handleDeleteExpense = (id) =>
+  const fetchInformation = async () => 
   {
-    setExpenseEntries(prevEntries => prevEntries.filter(entry => entry.id !== id))
-  }
-
-  const handleEditExpense = (id, newItemValue, newPriceValue) =>
-  {
-    setExpenseEntries(prevEntries => prevEntries.map(entry =>
+    try
     {
-      if(entry.id === id)
-      {
-        return {...entry, itemValue: newItemValue, priceValue: newPriceValue}
-      }
-      return entry;
-    }))
+      const response = await axios.get(`http://localhost:3001/api/budgets/balance/${budgetId}`, {
+        withCredentials: true
+      });
+      setBudget(response.data.total_budget);
+      setTotalExpenses(response.data.totalExpenses);
+      setBalance(response.data.balance);
+    }
+    catch(error)
+    {
+      console.log("Failed the fetch for budget, balance and expenses", error);
+    }
   }
+
+  useEffect(() => 
+  {
+    fetchInformation();
+  }, [budgetId]);
+
+  const handleBudgetChange = async () =>
+  {
+    await fetchInformation();
+  }
+
+  const handleExpenseChange = async () =>
+    {
+      await fetchInformation();
+    }
+
+
   return (
     <>
-    <TopBar></TopBar>
-    <div className='grid grid-cols-2 gap-8'>
-      <EnterBudget onSetBudget={setBudget}></EnterBudget>
-      <Expenses onAddExpense={handleAddExpense}></Expenses>
-    </div>
-    <Information budget={budget} expenses={expenseEntries.reduce((sum, entry) => sum + entry.priceValue,  0)}></Information>
-    <ExpensesList entries={expenseEntries} onDelete={handleDeleteExpense} onEdit={handleEditExpense}></ExpensesList>
+      <TopBar />
+      <div className='grid grid-cols-2 gap-8'>
+        <EnterBudget budgetId={budgetId} onBudgetChange={handleBudgetChange} />
+        <Expenses budgetId={budgetId}  onExpenseChange={handleExpenseChange}/>
+      </div>
+      <Information budgetId={budgetId} budget={budget} totalExpenses={totalExpenses} balance={balance} />
+      <ExpensesList onExpenseChange={handleExpenseChange} budgetId={budgetId} />
     </>
-  )
+  );
 }
 
-export default Planner
+export default Planner;

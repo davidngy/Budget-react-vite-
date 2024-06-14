@@ -1,10 +1,8 @@
-import React from "react";
-import { useState } from "react";
+import axios from 'axios';
+import React, { useState, useEffect } from "react";
 
-function Information({budget, expenses})
+function Information({ budget, totalExpenses, balance})
 {
-    const balance = budget - expenses;
-
     return (
         <>
             <div className="flex justify-evenly bg-blue-200 mt-8 rounded-md">
@@ -14,7 +12,7 @@ function Information({budget, expenses})
                 </div>
                 <div className="flex flex-col">
                     <h4>Expenses</h4>
-                    <p>{expenses}</p>
+                    <p>{totalExpenses}</p>
                 </div>
                 <div className="flex flex-col">
                     <h4>Balance</h4>

@@ -13,11 +13,15 @@ function Register()
         event.preventDefault();
         try
         {
+            const trimmedEmail = email.trim();
+            const trimmedPassword = password.trim();
             const response = await axios.post('http://localhost:3001/api/auth/register', {
-                email, password
+                email: trimmedEmail, 
+                password: trimmedPassword
             });
             alert('registered')
-            navigate('/');
+            console.log(response)
+            navigate('/login');
         }
         catch (error)
         {
