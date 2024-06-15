@@ -31,17 +31,38 @@ function ExpensesList({ budgetId, onExpenseChange  })
             }
     },[onExpenseChange])
     
-    const startEdit = (entry) =>
+    const startEdit = (expense) =>
     {
-        setEditingId(entry.id)
+        setEditingId(expense._id);
     }
 
-    const saveEdit = (id, newItemValue, newPriceValue) =>
-    {
-        onEdit(id, newItemValue, newPriceValue);
-        onExpenseChange();
-        setEditingId(0)
-    }
+    const saveEdit = async (id, newItemValue, newPriceValue) => {
+        try {
+            const response = await axios.put(`http://localhost:3001/api/expenses/${id}`, {
+                description: newItemValue,
+                amount: newPriceValue
+            }, {
+                withCredentials: true
+            });
+            setExpenses(expenses.map(expense => expense._id === id ? response.data : expense));
+            setEditingId(null);
+            onExpenseChange();
+        } catch (error) {
+            console.error('Error saving expense:', error);
+        }
+    };
+
+    const deleteExpense = async (id) => {
+        try {
+            await axios.delete(`http://localhost:3001/api/expenses/${id}`, {
+                withCredentials: true
+            });
+            setExpenses(expenses.filter(expense => expense._id !== id));
+            onExpenseChange();
+        } catch (error) {
+            console.error('Error deleting expense:', error);
+        }
+    };
     return (
         <>
             <div className="border-2 border-black mt-8">
@@ -50,14 +71,14 @@ function ExpensesList({ budgetId, onExpenseChange  })
                 {expenses.map(expense => (
                         <div key={expense._id} className="grid grid-cols-3 text-start ml-4 ">
                             {editingId === expense._id ? (
-                                <EditExpense expense={expense} onSave={saveEdit} />
+                                <EditExpense expense={expense}  onSave={(newItemValue, newPriceValue) => saveEdit(expense._id, newItemValue, newPriceValue)} />
                             ) : (
                                 <>
                                     <p className="border-blue-400 border-l-2 my-2 pl-2">{expense.description}</p>
                                     <p>{expense.amount} €</p>
                                     <div>
                                         <box-icon name='edit' type='solid' onClick={() => startEdit(expense)}></box-icon>
-                                        {/*<box-icon type='solid' name='trash' onClick={() => onDelete(expense._id)}></box-icon>*/}
+                                        <box-icon type='solid' name='trash' onClick={() => deleteExpense(expense._id)}></box-icon>
                                     </div>
                                 </>
                             )}

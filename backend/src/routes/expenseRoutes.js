@@ -31,23 +31,70 @@ router.post('/',ensureAuthenticated, async (req, res) =>
         }
     });
 
-    router.get('/:budget_id', ensureAuthenticated, async (req, res) => {
-        try
-        {
-           const { budget_id } = req.params;
+// Get all expenses for a specific budget
+router.get('/:budget_id', ensureAuthenticated, async (req, res) => {
+    try
+    {
+        const { budget_id } = req.params;
 
-           const budget = await Budget.findOne({_id: budget_id, userId: req.session.userId })
-           if (!budget) {
-            return res.status(400).send({ message: 'Invalid budget ID or you do not have access to this budget.' });
-            }
+        const budget = await Budget.findOne({_id: budget_id, userId: req.session.userId })
+        if (!budget) {
+        return res.status(400).send({ message: 'Invalid budget ID or you do not have access to this budget.' });
+        }
 
-            const expenses = await Expense.find({ budget_id });
-            res.status(200).send(expenses);
-        }
-        catch(error)
+        const expenses = await Expense.find({ budget_id });
+        res.status(200).send(expenses);
+    }
+    catch(error)
+    {
+        res.status(500).send({ message: error.message });
+    }
+})
+
+router.put('/:id', ensureAuthenticated, async (req, res) => {
+    try
+    {
+        const { id } = req.params;
+        const { description, amount } = req.body;
+
+        const updatedExpense = await Expense.findByIdAndUpdate(
+            id,
+            { description, amount },
+            { new: true }
+        );
+
+        if(!updatedExpense) 
         {
-            res.status(500).send({ message: error.message });
+            return res.status(404).send({ message: 'Expense not found'})
         }
-    })
+
+        res.status(200).send(updatedExpense);
+    }
+    catch(error)
+    {
+        res.status(500).send({ message: error.message})
+    }
+})
+
+// Delete an expense
+router.delete('/:id', ensureAuthenticated, async (req, res) => {
+    try
+    {
+        const { id } = req.params;
+
+        const deletedExpense = await Expense.findByIdAndDelete(id);
+
+        if(!deletedExpense)
+        {
+            return res.status(404).send({ message: 'Expense not found '});
+        }
+
+        res.status(200).send({ message: 'Expense deleted'});
+    }
+    catch(error)
+    {
+        res.status(500).send({ message: error.message });
+    }
+})
 
 export default router;

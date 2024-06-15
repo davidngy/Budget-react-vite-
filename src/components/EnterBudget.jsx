@@ -22,6 +22,7 @@ function EnterBudget({budgetId, onBudgetChange})
             }, {
                 withCredentials: true
             });
+            setInputValue('');
             onBudgetChange();
             console.log("response:", response);
         } catch (error) 

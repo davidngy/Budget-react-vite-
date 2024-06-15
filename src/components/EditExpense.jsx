@@ -2,25 +2,20 @@ import React, {useState} from 'react'
 
 function EditExpense({ expense, onSave })
 {
-    const [itemValue, setItemValue] = useState(expense.itemValue);
-    const [priceValue, setPriceValue] = useState(expense.priceValue);
+    const [description, setDescription] = useState(expense.description);
+    const [amount, setAmount] = useState(expense.amount);
     
-    const handleSubmit = (event) =>
-    {
-        event.preventDefault()
-        onSave(expense.id, itemValue, parseFloat(priceValue));
-    }
+    const handleSave = (e) => {
+        e.preventDefault();
+        onSave(description, amount);
+    };
 
-    const handlePriceChange = (event) =>
-    {
-        setPriceValue(parseFloat(event.target.value));
-    }
   return (
     <div>
-        <form onSubmit={handleSubmit} className='grid grid-cols-3 text-start ml-4'>
-            <input type="text" className="border-blue-400 border-l-2 my-2 pl-2" value={itemValue}  onChange={e => setItemValue(e.target.value)}/>
-            <input type="number" value={priceValue} onChange={handlePriceChange}/>
-            <button type='submit'>save</button>
+        <form  className='grid grid-cols-3 text-start ml-4'>
+            <input type="text" className="border-blue-400 border-l-2 my-2 pl-2" value={description} onChange={(e) => setDescription(e.target.value)}/>
+            <input type="number" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}/>
+            <button type='submit' onClick={handleSave}>save</button>
         </form>
     </div>
   )

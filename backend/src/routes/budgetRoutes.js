@@ -24,6 +24,7 @@ router.post('/',ensureAuthenticated, async (req, res) =>
                 userId: req.session.userId,
                 total_budget
             });
+            
             await budget.save();
             console.log("Saved new budget:", budget);
         }
@@ -48,7 +49,7 @@ router.get('/balance/:budget_id', ensureAuthenticated, async (req, res) => {
                 return res.status(404).send({message: 'No budget for this user!'})
             }
 
-        const expenses = await Expense.find({ budget_id})
+        const expenses = await Expense.find({ budget_id })
 
         const totalExpenses = expenses.reduce((total, expense) => total + expense.amount, 0); //itterates through every item
 

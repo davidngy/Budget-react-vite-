@@ -90,7 +90,7 @@ router.post('/logout', async (req, res) =>
                 return res.status(500).send({ message: 'Error logging out' });
             }
             res.clearCookie('connect.sid');
-            console.log('fucking destroyed.')
+            console.log('fucking destroyed.');
             res.status(200).send({ message: 'fucking destroyed' });
         });
     } catch (err) {
